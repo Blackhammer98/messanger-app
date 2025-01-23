@@ -1,33 +1,23 @@
-import express, { Request, Response, NextFunction } from 'express';
-import expressWs from 'express-ws';
 
-// Extend the Express request type
-interface CustomRequest extends Request {
-  testing?: string;
-}
 
-const app = express() as unknown as expressWs.Application;
+import express from 'express'
+import { WebSocketServer ,WebSocket } from 'ws'
 
-expressWs(app);
+const app = express()
+const httpServer = app.listen(8080)
 
-app.use((req: CustomRequest, res: Response, next: NextFunction) => {
-  console.log('middleware');
-  req.testing = 'testing';
-  next();
-});
+const wss = new WebSocketServer({ server: httpServer });
 
-app.get('/', (req: CustomRequest, res: Response) => {
-  console.log('get route', req.testing);
-  res.end();
-});
+wss.on('connection', function connection(ws) {
+  ws.on('error', console.error);
 
-app.ws('/', (ws, req: CustomRequest) => {
-  ws.on('message', (msg) => {
-    console.log(msg);
+  ws.on('message', function message(data, isBinary) {
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(data, { binary: isBinary });
+      }
+    });
   });
-  console.log('socket', req.testing);
-});
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+  ws.send('Hello! Message From Server!!');
 });
