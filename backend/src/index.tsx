@@ -1,7 +1,13 @@
 import express from 'express'
 import { WebSocketServer , WebSocket } from 'ws'
+import dotenv from "dotenv";
+import userRoutes from "./routes/userRoutes"
 
-const app = express()
+
+dotenv.config();
+const app = express();
+app.use(express.json());
+app.use("/api/users", userRoutes);
 const httpServer = app.listen(8080)
 
 const wss = new WebSocketServer({ server: httpServer });

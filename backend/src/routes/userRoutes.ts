@@ -2,7 +2,7 @@ import express from "express"
 import {  loginUser, registerUser } from "../services/userManager";
 
 
-export const router = express.Router();
+  const router = express.Router();
 
 
 router.post("/register" , async (req , res ) => {
@@ -38,4 +38,4 @@ router.post("/login" , async (req ,res) => {
         })
     }})
 
-
+export default router;
